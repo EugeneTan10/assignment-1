@@ -1,0 +1,87 @@
+#read data
+imdb <- read.csv(file="/Users/EugeneTan/Downloads/DataMining/movie_metadata.csv" , header = TRUE) 
+
+#replace blank value with NA
+imdb[imdb==""] <- NA
+
+#dimensionality reduction
+imdb$num_critic_for_reviews <- NULL
+imdb$facenumber_in_poster <- NULL
+imdb$plot_keywords <- NULL
+imdb$director_facebook_likes <- NULL
+imdb$num_user_for_reviews <- NULL
+imdb$movie_imdb_link <- NULL
+imdb$movie_facebook_likes <- NULL
+imdb$num_voted_users <- NULL
+imdb$actor_3_facebook_likes <- NULL
+imdb$actor_2_facebook_likes <- NULL
+imdb$actor_1_facebook_likes <- NULL
+imdb$cast_total_facebook_likes <- NULL
+
+#purposely remove rows number 5 due to too many NA values
+imdb <- imdb [-c(5),]
+rownames(imdb) <- NULL
+
+#replace the NA value in “content_rating” column with “PG”
+imdb$content_rating[which(is.na(imdb$content_rating))]<- "PG"
+
+#replace the NA value in “content_rating” column with “Color”
+#if (title_year >= 1932) replace NA with Color else do nothing
+imdb$color[which(is.na(imdb$color) & imdb$title_year > 1932)] <- "Color"
+
+#imputation
+#replace the NA value in “aspect_ratio” column with an estimated mean value.
+library(Hmisc)
+imdb$aspect_ratio <- impute(imdb$aspect_ratio,mean)
+is.imputed(imdb$aspect_ratio)
+
+#replace the NA value in “budget” column with an estimated mean value.
+library(Hmisc)
+imdb$budget <- impute(imdb$budget,mean)
+is.imputed(imdb$budget)
+
+#replace the NA value in “duration” column with an estimated mean value.
+library(Hmisc)
+imdb$duration <- impute(imdb$duration,mean)
+is.imputed(imdb$duration)
+
+#replace the NA value in “gross” column with an estimated mean value.
+library(Hmisc)
+imdb$duration <- impute(imdb$gross,mean)
+is.imputed(imdb$gross)
+
+#reorder the columns
+imdb <- imdb[c("color","movie_title","title_year","genres","duration","country","language","imdb_score","content_rating","director_name","actor_1_name","actor_2_name","actor_3_name","budget","gross","aspect_ratio")]
+
+#checking the number of NA values in these two column "movie_title" and "genres"
+sum(is.na(imdb$movie_title))
+#output -> 0
+sum(is.na(imdb$genres))
+#output -> 0
+
+#omitting the rows with NA value in specific columns : "director_name" , "actor_1_name" , "actor_2_name" , "actor_3_name" , "color"
+imdb <- imdb[!is.na(imdb$director_name), ]
+rownames(imdb) <- NULL
+
+imdb <- imdb[!is.na(imdb$actor_1_name), ]
+rownames(imdb) <- NULL
+
+imdb <- imdb[!is.na(imdb$actor_2_name), ]
+rownames(imdb) <- NULL
+
+imdb <- imdb[!is.na(imdb$actor_3_name), ]
+rownames(imdb) <- NULL
+
+imdb <- imdb[!is.na(imdb$color), ]
+rownames(imdb) <- NULL
+
+#omitting the rows with NA value in specific columns : "title_year","country","language"
+imdb <- imdb[!is.na(imdb$country), ]
+rownames(imdb) <- NULL
+
+imdb <- imdb[!is.na(imdb$language), ]
+rownames(imdb) <- NULL
+
+imdb <- imdb[!is.na(imdb$title_year), ]
+rownames(imdb) <- NULL
+
